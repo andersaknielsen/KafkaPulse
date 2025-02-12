@@ -1,0 +1,11 @@
+[project]
+name = "kafkapulse"
+version = "0.1.0"
+description = "KafkaPulse is a spare time coding exercise designed to learn about streaming data using Apache Kafka. The project involves processing heart rate signals broadcast from a Garmin watch."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bleak>=0.22.3",
+    "matplotlib>=3.10.0",
+    "pytest>=8.3.4",
+]
