@@ -24,13 +24,16 @@ KafkaPulse is a spare time coding exercise designed to learn about streaming dat
     cd KafkaPulse
     ```
 
-2. Install the required Python libraries:
+1. Install the required Python libraries:
     ```bash
     uv sync
     ```
 
-3. Set up Apache Kafka:
-    TODO
+1. Set up Apache Kafka:
+    ```bash
+    cd kafka
+    docker compose up -d
+    ```
 
 ## Usage
 
@@ -39,9 +42,16 @@ KafkaPulse is a spare time coding exercise designed to learn about streaming dat
     TODO
     ```
 
-2. Run the KafkaPulse script:
+1. Run the KafkaPulse script:
     ```bash
     python src\kafka_pulse.py
+    ```
+
+## Cleanup
+1. Terminate Kafka server
+    ```bash
+    cd kafka
+    docker compose down
     ```
 
 ## Contributing

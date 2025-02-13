@@ -65,14 +65,14 @@ class HeartRateMonitor:
 
     async def mock_heart_rate(self) -> None:
         """
-        Simulates heart rate data by generating a random heart rate value between 50 and 70 every second.
+        Simulates heart rate data by generating a random heart rate value between 50 and 70 every second for 10 seconds.
         """
         for _ in range(10):
             heart_rate = random.randint(50, 70)
             timestamp = time()
             print(f"Mock HR Value: {heart_rate} at {timestamp}")
             self.data_collector.add_data(heart_rate, timestamp)
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.1)
 
         self.data_collector.plot_data()
 
