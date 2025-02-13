@@ -1,69 +1,88 @@
 import asyncio
 import struct
-# using epoch as time
+from typing import Tuple, List
 from time import time
+import random
 
 from bleak import BleakClient
 
-import src.plot_pulse as plot_pulse
-
-from typing import Tuple
+import plot_pulse as plot_pulse
 
 # Constants
 HEART_RATE_MEASUREMENT = "00002A37-0000-1000-8000-00805F9B34FB"
 DEVICE_ADDRESS = "E0:48:24:71:8C:B2"
 
-def parse_heart_rate(data) -> Tuple:
-    """Parses the heart rate measurement data"""
-    flags = data[0]
-    hr_fmt = flags & 0b00000001  # Heart Rate Value Format bit (0 = 8-bit, 1 = 16-bit)
-    # snsr_cntct_spprtd = (flags & 0b00000100) >> 2  # Sensor contact supported bit
-    # snsr_detect = (flags & 0b00001000) >> 3  # Sensor contact detected bit
-    # nrg_expnd = (flags & 0b00010000) >> 4  # Energy expended status bit
-    # rr_int = (flags & 0b00100000) >> 5  # RR-Interval bit
+class HeartRateDataCollector:
+    def __init__(self):
+        self.data: List[Tuple[int, float]] = []
 
-    if hr_fmt:
-        hr_val, = struct.unpack_from("<H", data, 1)
-    else:
-        hr_val, = struct.unpack_from("<B", data, 1)
-    
-    # Print the HR value and the time
-    print(f"HR Value: {hr_val} at {time()}")
-    return (hr_val, time())
+    def add_data(self, heart_rate: int, timestamp: float) -> None:
+        self.data.append((heart_rate, timestamp))
+
+    def plot_data(self) -> None:
+        plot_pulse.plot_data(pulse_data=self.data)
+
+class HeartRateMonitor:
+    def __init__(self, address: str, data_collector: HeartRateDataCollector):
+        self.address = address
+        self.data_collector = data_collector
+
+    def parse_heart_rate(self, data) -> Tuple[int, float]:
+        """Parses the heart rate measurement data"""
+        flags = data[0]
+        hr_fmt = flags & 0b00000001  # Heart Rate Value Format bit (0 = 8-bit, 1 = 16-bit)
+
+        if hr_fmt:
+            hr_val, = struct.unpack_from("<H", data, 1)
+        else:
+            hr_val, = struct.unpack_from("<B", data, 1)
+        
+        # Print the HR value and the time
+        print(f"HR Value: {hr_val} at {time()}")
+        return (hr_val, time())
 
 
-async def connect_and_receive_hr(address) -> None:
-    """
-    Connects to a BLE device at the given address and starts receiving heart rate notifications.
-    Args:
-        address (str): The MAC address of the BLE device to connect to.
-    This function establishes a connection to the BLE device using the BleakClient.
-    Once connected, it starts receiving heart rate measurements and processes them
-    using the hr_val_handler function. The connection is maintained until the client
-    is disconnected.
-    """
-    
-    gather_data = []
+    async def connect_and_receive_hr(self) -> None:
+        """
+        Connects to a BLE device at the given address and starts receiving heart rate notifications.
+        """
+        async with BleakClient(self.address) as client:
+            connected = client.is_connected
+            print(f"Connected: {connected}")
 
-    async with BleakClient(address) as client:
-        connected = client.is_connected
-        print(f"Connected: {connected}")
+            def heart_rate_notification_handler(sender, data):
+                """Notification handler for Heart Rate Measurement."""
+                heart_rate_data = self.parse_heart_rate(data)
+                self.gather_data.append(heart_rate_data)
 
-        def hr_val_handler(sender, data):
-            """Notification handler for Heart Rate Measurement."""
-            heart_rate_data = parse_heart_rate(data)
-            gather_data.append(heart_rate_data)
+            await client.start_notify(HEART_RATE_MEASUREMENT, heart_rate_notification_handler)
 
-        await client.start_notify(HEART_RATE_MEASUREMENT, hr_val_handler)
+            while client.is_connected:
+                await asyncio.sleep(1)
+        
+        # Plot the data
+        self.data_collector.plot_data()
 
-        while client.is_connected:
+    async def mock_heart_rate(self) -> None:
+        """
+        Simulates heart rate data by generating a random heart rate value between 50 and 70 every second.
+        """
+        for _ in range(10):
+            heart_rate = random.randint(50, 70)
+            timestamp = time()
+            print(f"Mock HR Value: {heart_rate} at {timestamp}")
+            self.data_collector.add_data(heart_rate, timestamp)
             await asyncio.sleep(1)
-    
-    # Plot the data
-    plot_pulse.plot_data(pulse_data=gather_data)
+
+        self.data_collector.plot_data()
+
 
 def main() -> None:
-    asyncio.run(connect_and_receive_hr(DEVICE_ADDRESS))
+    data_collector = HeartRateDataCollector()
+    monitor = HeartRateMonitor(DEVICE_ADDRESS, data_collector)
+    # asyncio.run(monitor.connect_and_receive_hr())
+    # Use the mock heart rate method for testing
+    asyncio.run(monitor.mock_heart_rate())
 
 if __name__ == "__main__":
     """This module connects to a BLE device and receives heart rate notifications.

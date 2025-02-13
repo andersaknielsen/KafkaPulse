@@ -12,9 +12,9 @@ KafkaPulse is a spare time coding exercise designed to learn about streaming dat
 
 ### Prerequisites
 
-- Python 3.x
-- Apache Kafka
 - Garmin watch with heart rate broadcasting capability
+- Python 3.12+
+- Apache Kafka (eventually)
 
 ### Installation
 
@@ -26,7 +26,7 @@ KafkaPulse is a spare time coding exercise designed to learn about streaming dat
 
 2. Install the required Python libraries:
     ```bash
-    uv pip install bleak bleakheart
+    uv sync
     ```
 
 3. Set up Apache Kafka:
@@ -41,7 +41,7 @@ KafkaPulse is a spare time coding exercise designed to learn about streaming dat
 
 2. Run the KafkaPulse script:
     ```bash
-    python kafka_pulse.py
+    python src\kafka_pulse.py
     ```
 
 ## Contributing
