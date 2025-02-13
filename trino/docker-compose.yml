@@ -1,0 +1,16 @@
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  trino:
+      image: 'trinodb/trino:433'
+      container_name: trino
+      networks:
+        - app-tier
+      ports:
+        - '8080:8080'
+      volumes:
+        - ./etc:/etc/trino
+# Trino CLI:
+# docker exec -it trino trino

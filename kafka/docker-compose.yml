@@ -10,7 +10,7 @@ services:
       - app-tier
     ports:
       - 9092:9092
-      - '9094:9094'
+      - 9094:9094
     # volumes:
     #   - "kafka_data:/bitnami"
     # expose:
@@ -45,3 +45,6 @@ services:
       echo -e 'Successfully created the following topics:'
       ./kafka-topics.sh --bootstrap-server kafka:9092 --list
       "
+
+# Connect to CLI:
+# docker exec --workdir /opt/bitnami/kafka/bin -it kafka-init-kafka-1 bash
