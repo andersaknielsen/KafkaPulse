@@ -42,7 +42,7 @@ class HeartRateMonitor:
         return (hr_val, time())
 
 
-    async def connect_and_receive_hr(self) -> None:
+    async def connect_and_receive_hr(self, plot_data = True) -> None:
         """
         Connects to a BLE device at the given address and starts receiving heart rate notifications.
         """
@@ -60,10 +60,11 @@ class HeartRateMonitor:
             while client.is_connected:
                 await asyncio.sleep(1)
         
-        # Plot the data
-        self.data_collector.plot_data()
+        if plot_data:
+            # Plot the data
+            self.data_collector.plot_data()
 
-    async def mock_heart_rate(self) -> None:
+    async def mock_heart_rate(self, plot_data = False) -> None:
         """
         Simulates heart rate data by generating a random heart rate value between 50 and 70 every second for 10 seconds.
         """
@@ -73,16 +74,17 @@ class HeartRateMonitor:
             print(f"Mock HR Value: {heart_rate} at {timestamp}")
             self.data_collector.add_data(heart_rate, timestamp)
             await asyncio.sleep(0.1)
-
-        self.data_collector.plot_data()
+            
+        if plot_data:
+            self.data_collector.plot_data()
 
 
 def main() -> None:
     data_collector = HeartRateDataCollector()
     monitor = HeartRateMonitor(DEVICE_ADDRESS, data_collector)
-    # asyncio.run(monitor.connect_and_receive_hr())
+    # asyncio.run(monitor.connect_and_receive_hr(plot_data=True))
     # Use the mock heart rate method for testing
-    asyncio.run(monitor.mock_heart_rate())
+    asyncio.run(monitor.mock_heart_rate(plot_data=False))
 
 if __name__ == "__main__":
     """This module connects to a BLE device and receives heart rate notifications.

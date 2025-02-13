@@ -139,11 +139,21 @@ wheels = [
 ]
 
 [[package]]
+name = "kafka-python"
+version = "2.0.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/08/c6/3d4b83014287c14843abb747f5b1b0dbafe2e570fecbcff8fdb6daf6310e/kafka-python-2.0.3.tar.gz", hash = "sha256:9ef48bc21f4ac78d80b9f424e5f0f0cd63a29652f5e5f4369960434806f1bbdd", size = 270617 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/64/1d/6ad8fcbac9aa5cfa2992888580b232a060d73416f34e003db379f6cd038a/kafka_python-2.0.3-py2.py3-none-any.whl", hash = "sha256:ff28bee2430359256d947cffaf951b95e9c66697b59af28014d5b28e160a6084", size = 249673 },
+]
+
+[[package]]
 name = "kafkapulse"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "bleak" },
+    { name = "kafka-python" },
     { name = "matplotlib" },
     { name = "pytest" },
 ]
@@ -151,6 +161,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "bleak", specifier = ">=0.22.3" },
+    { name = "kafka-python", specifier = ">=2.0.3" },
     { name = "matplotlib", specifier = ">=3.10.0" },
     { name = "pytest", specifier = ">=8.3.4" },
 ]
